@@ -255,8 +255,7 @@ function renderPromedio() {
           : dif > 0 ? '<span style="color:var(--ok)">+' + dif + ' sobre el promedio</span>'
                     : '<span style="color:var(--bad)">' + dif + ' bajo el promedio</span>';
         return '<div class="hrow"><div class="sc">' + a.global + '</div>' +
-          '<div class="mt"><b>' + aplicante(i) + ' score' +
-          (a.demo ? '<span class="tag">ejemplo</span>' : '') + '</b>' +
+          '<div class="mt"><b>' + aplicante(i) + ' score</b>' +
           '<small>' + a.ok + '/' + a.nQ + ' correctas · ' + a.date + '</small></div>' +
           '<div class="dl">' + rel + '</div></div>';
       }).join('');
@@ -614,9 +613,8 @@ function renderProgreso() {
           : d > 0 ? '<span style="color:var(--ok)">▲ ' + d + '</span>'
           : d < 0 ? '<span style="color:var(--bad)">▼ ' + Math.abs(d) + '</span>' : '=';
         return '<div class="hrow"><div class="sc">' + a.global + '</div>' +
-          '<div class="mt"><b>' + aplicante(i - 1) + ' · ' + a.kind +
-          (a.demo ? '<span class="tag">ejemplo</span>' : '') +
-          '</b><small>' + a.date + ' · ' + a.ok + '/' + a.nQ + ' correctas</small></div>' +
+          '<div class="mt"><b>' + aplicante(i - 1) + ' · ' + a.kind + '</b>' +
+          '<small>' + a.date + ' · ' + a.ok + '/' + a.nQ + ' correctas</small></div>' +
           '<div class="dl">' + delta + '</div></div>';
       }).join('');
 
@@ -652,7 +650,15 @@ function ytId(url) {
 function renderMas() {
   $('#setDate').value = S.examDate;
   $('#setGoal').value = S.goal;
-  $('#demoCard').hidden = !S.hasDemo;
+  if (S.hasDemo) {
+    $('#demoTxt').textContent = 'Los 5 puntajes precargados están activos. Quítalos cuando ' +
+      'tengas los tuyos y quieras la pestaña Promedio solo con datos propios.';
+    $('#demoToggle').textContent = 'Quitar los 5 puntajes precargados';
+  } else {
+    $('#demoTxt').textContent = 'Los 5 puntajes precargados no están. Puedes devolverlos si ' +
+      'quieres que las gráficas y la pestaña Promedio no se vean vacías.';
+    $('#demoToggle').textContent = 'Restaurar los 5 puntajes precargados';
+  }
   $('#vidArea').innerHTML = AREAS.map(a => '<option value="'+a.id+'">'+a.nombre+'</option>').join('') +
     '<option value="gen">Estrategia general</option>';
 
@@ -729,10 +735,19 @@ $('#btnQuit').onclick = () => {
 };
 $('#btnReview').onclick = renderReview;
 
-$('#clearDemo').onclick = () => {
-  if (!confirm('Esto quita los 5 puntajes precargados. ¿Continuar?')) return;
-  S.attempts = S.attempts.filter(a => !a.demo);
-  S.hasDemo = false; save(); go('mas');
+$('#demoToggle').onclick = () => {
+  if (S.hasDemo) {
+    if (!confirm('Esto quita los 5 puntajes precargados. Tus propios intentos no se tocan. ¿Continuar?')) return;
+    S.attempts = S.attempts.filter(a => !a.demo);
+    S.hasDemo = false;
+  } else {
+    // vuelve a insertarlos sin duplicar y ordena todo por fecha
+    S.attempts = S.attempts.filter(a => !a.demo)
+      .concat(DEMO_ATTEMPTS.map(a => ({ ...a, global: globalScore(a.areas) })))
+      .sort((x, y) => String(x.date).localeCompare(String(y.date)));
+    S.hasDemo = true;
+  }
+  save(); go('mas');
 };
 
 $('#ddayBtn').onclick = () => go('mas');

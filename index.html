@@ -496,13 +496,10 @@
           <textarea id="impBox" placeholder='{"examDate":"...","attempts":[...]}'></textarea></label>
         <button class="btn alt sm" id="btnImport">Importar respaldo</button>
       </div>
-      <div class="card" id="demoCard" hidden>
+      <div class="card" id="demoCard">
         <h3 style="font-size:15px">Puntajes precargados</h3>
-        <p class="tiny" style="margin:0 0 12px">
-          El sitio viene con 5 puntajes ya cargados para que las gráficas y la pestaña Promedio no
-          se vean vacías. Quítalos cuando tengas los tuyos.
-        </p>
-        <button class="btn alt sm" id="clearDemo">Quitar los 5 puntajes precargados</button>
+        <p class="tiny" id="demoTxt" style="margin:0 0 12px"></p>
+        <button class="btn alt sm" id="demoToggle"></button>
       </div>
       <div class="card">
         <h3 style="font-size:15px">Borrar</h3>
