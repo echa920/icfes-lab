@@ -95,8 +95,8 @@ function save() {
 /* ==================================================================
    Router
 ================================================================== */
-const VIEWS = ['inicio','diag','practica','progreso','mas','quiz','result','review'];
-const TABS  = ['inicio','diag','practica','progreso','mas'];
+const VIEWS = ['inicio','promedio','diag','practica','progreso','mas','quiz','result','review'];
+const TABS  = ['inicio','promedio','diag','practica','progreso','mas'];
 
 function go(view) {
   for (const v of VIEWS) { const el = $('#view-' + v); if (el) el.hidden = (v !== view); }
@@ -104,6 +104,7 @@ function go(view) {
   $('#demoBanner').hidden = !S.hasDemo || !TABS.includes(view);
   window.scrollTo(0, 0);
   if (view === 'inicio')   renderInicio();
+  if (view === 'promedio') renderPromedio();
   if (view === 'diag')     renderDiag();
   if (view === 'practica') renderPractica();
   if (view === 'progreso') renderProgreso();
@@ -134,25 +135,18 @@ function renderDday() {
 
 function renderInicio() {
   renderDday();
-  const avg = avgGlobal();
-  $('#avgScore').textContent = avg === null ? '—' : avg;
 
-  const C = 2 * Math.PI * 57;
-  const frac = avg === null ? 0 : Math.min(avg / 500, 1);
-  $('#ringArc').setAttribute('stroke-dasharray', C.toFixed(1));
-  $('#ringArc').setAttribute('stroke-dashoffset', (C * (1 - frac)).toFixed(1));
-
-  if (avg === null) {
-    $('#heroTitle').textContent = 'Sin intentos aún';
+  if (!S.attempts.length) {
+    $('#heroTitle').textContent = 'Sin puntajes aún';
     $('#heroSub').textContent = 'Empieza con el diagnóstico para saber dónde estás parado.';
   } else {
-    const n = S.attempts.length, last = S.attempts[n - 1].global, first = S.attempts[0].global;
+    const n = S.attempts.length, last = S.attempts[n-1].global, first = S.attempts[0].global;
     const d = last - first;
-    $('#heroTitle').textContent = 'Promedio global: ' + avg + ' / 500';
+    $('#heroTitle').textContent = 'Último puntaje: ' + last + ' / 500';
     $('#heroSub').textContent = n === 1
-      ? 'Un intento registrado. Meta: ' + S.goal + '.'
-      : n + ' intentos · último ' + last + ' · ' + (d >= 0 ? '+' + d : d) +
-        ' desde el primero · meta ' + S.goal;
+      ? 'Un aplicante registrado · meta ' + S.goal
+      : n + ' aplicantes · promedio ' + avgGlobal() + ' · ' +
+        (d >= 0 ? '+' + d : d) + ' entre el primero y el último · meta ' + S.goal;
   }
 
   const totQ  = S.attempts.reduce((s,a) => s + (a.nQ||0), 0) + AREAS.reduce((s,a) => s + S.stats[a.id].n, 0);
@@ -225,6 +219,66 @@ function renderChart() {
          'text-anchor="middle">'+(i+1)+'</text>';
   });
   svg.innerHTML = g;
+}
+
+/* ==================================================================
+   PROMEDIO — un puntaje por aplicante, en orden de registro
+================================================================== */
+const aplicante = (i) => 'Aplicante ' + (i + 1);
+
+function renderPromedio() {
+  const avg = avgGlobal();
+  const n = S.attempts.length;
+
+  $('#avgScore').textContent = avg === null ? '—' : avg;
+  const C = 2 * Math.PI * 57;
+  const frac = avg === null ? 0 : Math.min(avg / 500, 1);
+  $('#ringArc').setAttribute('stroke-dasharray', C.toFixed(1));
+  $('#ringArc').setAttribute('stroke-dashoffset', (C * (1 - frac)).toFixed(1));
+
+  if (avg === null) {
+    $('#avgTitle').textContent = 'Promedio general';
+    $('#avgSub').textContent = 'Sin puntajes registrados todavía.';
+  } else {
+    const lo = Math.min(...S.attempts.map(a => a.global));
+    const hi = Math.max(...S.attempts.map(a => a.global));
+    $('#avgTitle').textContent = 'Promedio de ' + n + (n === 1 ? ' aplicante' : ' aplicantes');
+    $('#avgSub').textContent = avg + ' de 500 · más bajo ' + lo + ' · más alto ' + hi +
+      ' · meta ' + S.goal;
+  }
+
+  /* lista: Aplicante 1 score, Aplicante 2 score, ... */
+  $('#applicants').innerHTML = !n
+    ? '<div class="empty">Cada intento que registres aparece aquí como un aplicante.</div>'
+    : S.attempts.map((a, i) => {
+        const dif = a.global - avg;
+        const rel = dif === 0 ? '<span class="tiny">en el promedio</span>'
+          : dif > 0 ? '<span style="color:var(--ok)">+' + dif + ' sobre el promedio</span>'
+                    : '<span style="color:var(--bad)">' + dif + ' bajo el promedio</span>';
+        return '<div class="hrow"><div class="sc">' + a.global + '</div>' +
+          '<div class="mt"><b>' + aplicante(i) + ' score' +
+          (a.demo ? '<span class="tag">ejemplo</span>' : '') + '</b>' +
+          '<small>' + a.ok + '/' + a.nQ + ' correctas · ' + a.date + '</small></div>' +
+          '<div class="dl">' + rel + '</div></div>';
+      }).join('');
+
+  /* tabla con el desglose por área de cada aplicante */
+  if (!n) { $('#applicantTbl').innerHTML = ''; return; }
+  const head = '<thead><tr><th>Aplicante</th>' +
+    AREAS.map(a => '<th>' + a.corto + '</th>').join('') + '<th>Global</th></tr></thead>';
+  const body = '<tbody>' + S.attempts.map((a, i) =>
+      '<tr><td>' + aplicante(i) + '</td>' +
+      AREAS.map(ar => '<td>' + (a.areas[ar.id] ?? '—') + '</td>').join('') +
+      '<td><b>' + a.global + '</b></td></tr>'
+    ).join('') +
+    '<tr><td><b>Promedio</b></td>' +
+    AREAS.map(ar => {
+      const vals = S.attempts.map(a => a.areas[ar.id]).filter(v => typeof v === 'number');
+      const m = vals.length ? Math.round(vals.reduce((s,v) => s+v, 0) / vals.length) : '—';
+      return '<td><b>' + m + '</b></td>';
+    }).join('') +
+    '<td><b style="color:var(--acc)">' + avg + '</b></td></tr></tbody>';
+  $('#applicantTbl').innerHTML = head + body;
 }
 
 /* ==================================================================
@@ -561,7 +615,8 @@ function renderProgreso() {
           : d > 0 ? '<span style="color:var(--ok)">▲ ' + d + '</span>'
           : d < 0 ? '<span style="color:var(--bad)">▼ ' + Math.abs(d) + '</span>' : '=';
         return '<div class="hrow"><div class="sc">' + a.global + '</div>' +
-          '<div class="mt"><b>#' + i + ' · ' + a.kind + (a.demo ? '<span class="tag">ejemplo</span>' : '') +
+          '<div class="mt"><b>' + aplicante(i - 1) + ' · ' + a.kind +
+          (a.demo ? '<span class="tag">ejemplo</span>' : '') +
           '</b><small>' + a.date + ' · ' + a.ok + '/' + a.nQ + ' correctas</small></div>' +
           '<div class="dl">' + delta + '</div></div>';
       }).join('');

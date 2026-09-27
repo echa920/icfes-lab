@@ -228,10 +228,10 @@
     position:fixed; left:0; right:0; bottom:0; z-index:30; background:rgba(17,27,46,.96);
     backdrop-filter:blur(12px); border-top:1px solid var(--line); padding-bottom:var(--pb);
   }
-  .navIn{max-width:840px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr)}
+  .navIn{max-width:840px; margin:0 auto; display:grid; grid-template-columns:repeat(6,1fr)}
   nav button{
-    background:0; border:0; padding:11px 2px 13px; display:grid; gap:3px; justify-items:center;
-    color:var(--dim2); font-size:10.5px; font-weight:600;
+    background:0; border:0; padding:11px 1px 13px; display:grid; gap:3px; justify-items:center;
+    color:var(--dim2); font-size:10px; font-weight:600; white-space:nowrap;
   }
   nav button .ic{font-size:18px; line-height:1}
   nav button[aria-current="true"]{color:var(--acc)}
@@ -267,22 +267,13 @@
   <!-- ==================== INICIO ==================== -->
   <div id="view-inicio">
     <section>
-      <div class="card hero">
-        <div class="ring">
-          <svg width="132" height="132" viewBox="0 0 132 132">
-            <circle cx="66" cy="66" r="57" fill="none" stroke="#0d1626" stroke-width="13"></circle>
-            <circle id="ringArc" cx="66" cy="66" r="57" fill="none" stroke="#fbbf24" stroke-width="13"
-                    stroke-linecap="round" stroke-dasharray="358" stroke-dashoffset="358"></circle>
-          </svg>
-          <div class="val"><b id="avgScore">—</b><small>DE 500</small></div>
-        </div>
-        <div class="heroTxt">
-          <p class="big" id="heroTitle">Sin intentos aún</p>
-          <p id="heroSub">Empieza con el diagnóstico para saber dónde estás parado.</p>
-          <div class="btnRow" style="margin-top:14px">
-            <button class="btn" data-go="diag">Hacer diagnóstico</button>
-            <button class="btn alt" data-go="practica">Practicar</button>
-          </div>
+      <div class="card">
+        <p class="big" id="heroTitle" style="font-size:17px; font-weight:600; margin:0 0 6px">Sin intentos aún</p>
+        <p id="heroSub" class="muted" style="margin:0">Empieza con el diagnóstico para saber dónde estás parado.</p>
+        <div class="btnRow" style="margin-top:14px">
+          <button class="btn" data-go="diag">Hacer diagnóstico</button>
+          <button class="btn alt" data-go="practica">Practicar</button>
+          <button class="btn alt" data-go="promedio">Ver promedio</button>
         </div>
       </div>
     </section>
@@ -304,6 +295,44 @@
     <section>
       <h2>Progreso contra tu meta</h2>
       <div class="card chartBox"><svg class="chart" id="chart" viewBox="0 0 660 200"></svg></div>
+    </section>
+  </div>
+
+  <!-- ==================== PROMEDIO ==================== -->
+  <div id="view-promedio" hidden>
+    <section>
+      <div class="card hero">
+        <div class="ring">
+          <svg width="132" height="132" viewBox="0 0 132 132">
+            <circle cx="66" cy="66" r="57" fill="none" stroke="#0d1626" stroke-width="13"></circle>
+            <circle id="ringArc" cx="66" cy="66" r="57" fill="none" stroke="#fbbf24" stroke-width="13"
+                    stroke-linecap="round" stroke-dasharray="358" stroke-dashoffset="358"></circle>
+          </svg>
+          <div class="val"><b id="avgScore">—</b><small>DE 500</small></div>
+        </div>
+        <div class="heroTxt">
+          <p class="big" id="avgTitle">Promedio general</p>
+          <p id="avgSub">Sin puntajes registrados todavía.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Puntajes por aplicante</h2>
+      <div class="card" id="applicants"></div>
+    </section>
+
+    <section>
+      <h2>Reparto del promedio</h2>
+      <div class="card">
+        <div class="tblBox">
+          <table class="tbl" id="applicantTbl"></table>
+        </div>
+        <p class="tiny" style="margin:14px 0 0">
+          El promedio es la media de los puntajes globales de todos los aplicantes registrados.
+          Cada puntaje global se calcula con la fórmula oficial del Icfes sobre los cinco puntajes por área.
+        </p>
+      </div>
     </section>
   </div>
 
@@ -362,7 +391,7 @@
   <!-- ==================== PROGRESO ==================== -->
   <div id="view-progreso" hidden>
     <section>
-      <h2>Historial de intentos</h2>
+      <h2>Puntajes registrados</h2>
       <div class="card" id="history"></div>
     </section>
     <section>
@@ -551,7 +580,8 @@
 <nav>
   <div class="navIn">
     <button data-go="inicio" aria-current="true"><span class="ic">📊</span>Inicio</button>
-    <button data-go="diag"><span class="ic">⏱️</span>Diagnóstico</button>
+    <button data-go="promedio"><span class="ic">🎯</span>Promedio</button>
+    <button data-go="diag"><span class="ic">⏱️</span>Examen</button>
     <button data-go="practica"><span class="ic">✏️</span>Práctica</button>
     <button data-go="progreso"><span class="ic">📈</span>Progreso</button>
     <button data-go="mas"><span class="ic">📘</span>Guía</button>
