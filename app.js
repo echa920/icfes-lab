@@ -101,7 +101,6 @@ const TABS  = ['inicio','promedio','diag','practica','progreso','mas'];
 function go(view) {
   for (const v of VIEWS) { const el = $('#view-' + v); if (el) el.hidden = (v !== view); }
   $$('nav button').forEach(b => b.setAttribute('aria-current', String(b.dataset.go === view)));
-  $('#demoBanner').hidden = !S.hasDemo || !TABS.includes(view);
   window.scrollTo(0, 0);
   if (view === 'inicio')   renderInicio();
   if (view === 'promedio') renderPromedio();
@@ -653,6 +652,7 @@ function ytId(url) {
 function renderMas() {
   $('#setDate').value = S.examDate;
   $('#setGoal').value = S.goal;
+  $('#demoCard').hidden = !S.hasDemo;
   $('#vidArea').innerHTML = AREAS.map(a => '<option value="'+a.id+'">'+a.nombre+'</option>').join('') +
     '<option value="gen">Estrategia general</option>';
 
@@ -730,8 +730,9 @@ $('#btnQuit').onclick = () => {
 $('#btnReview').onclick = renderReview;
 
 $('#clearDemo').onclick = () => {
+  if (!confirm('Esto quita los 5 puntajes precargados. ¿Continuar?')) return;
   S.attempts = S.attempts.filter(a => !a.demo);
-  S.hasDemo = false; save(); go('inicio');
+  S.hasDemo = false; save(); go('mas');
 };
 
 $('#ddayBtn').onclick = () => go('mas');

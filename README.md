@@ -48,10 +48,10 @@ ese progreso.
   **No son preguntas liberadas por el Icfes** ni reproducen ningún examen real.
   Para material oficial, consulta las guías de orientación y los cuadernillos
   publicados en [icfes.gov.co](https://www.icfes.gov.co).
-- El sitio viene con **5 intentos de ejemplo** cargados (promedio global 268) para
-  que las gráficas y el historial no se vean vacíos la primera vez. Están
-  marcados como "ejemplo" y hay un botón para borrarlos. **No son resultados
-  reales de nadie.**
+- El sitio viene con **5 puntajes precargados** (promedio global 268) para que las
+  gráficas y la pestaña Promedio no se vean vacías la primera vez. Se quitan desde
+  **Guía → Ajustes → Puntajes precargados**. Son cifras de muestra generadas para
+  la demostración; **no corresponden a resultados de ninguna persona real.**
 - La **fórmula del puntaje global es la oficial**. Lo que es una estimación son
   los puntajes por área: el Icfes los calcula con modelos de Teoría de Respuesta
   al Ítem, que ponderan cada pregunta según su dificultad y no son públicos.

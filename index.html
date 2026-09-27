@@ -41,18 +41,6 @@
   .count b{display:block; font-size:19px; color:var(--acc)}
   .count small{color:var(--dim2); font-size:10.5px; text-transform:uppercase; letter-spacing:.7px}
 
-  .demo{
-    display:flex; gap:10px; align-items:flex-start; margin:16px 0 0;
-    background:#2a2413; border:1px solid #574414; border-radius:var(--r);
-    padding:12px 14px; font-size:13px; color:#f4dfa8;
-  }
-  .demo b{color:var(--acc)}
-  .demo button{
-    margin-left:auto; flex:none; background:transparent; border:1px solid #6b5518;
-    color:var(--acc); border-radius:8px; padding:5px 11px; font-size:12px; font-weight:600;
-  }
-  .demo button:hover{background:#38300f}
-
   section{margin:22px 0}
   h2{font-size:12.5px; text-transform:uppercase; letter-spacing:1.1px; color:var(--dim2); margin:0 0 12px}
   h3{font-size:16px; margin:0 0 8px}
@@ -257,12 +245,6 @@
 </header>
 
 <main class="wrap">
-
-  <div class="demo" id="demoBanner" hidden>
-    <span>⚠️</span>
-    <div><b>Datos de ejemplo.</b> Los 5 intentos del historial son de demostración, no resultados reales tuyos. Bórralos cuando empieces a practicar en serio.</div>
-    <button id="clearDemo">Borrar</button>
-  </div>
 
   <!-- ==================== INICIO ==================== -->
   <div id="view-inicio">
@@ -513,6 +495,14 @@
         <label class="fld"><span>Importar: pega aquí un respaldo y confirma</span>
           <textarea id="impBox" placeholder='{"examDate":"...","attempts":[...]}'></textarea></label>
         <button class="btn alt sm" id="btnImport">Importar respaldo</button>
+      </div>
+      <div class="card" id="demoCard" hidden>
+        <h3 style="font-size:15px">Puntajes precargados</h3>
+        <p class="tiny" style="margin:0 0 12px">
+          El sitio viene con 5 puntajes ya cargados para que las gráficas y la pestaña Promedio no
+          se vean vacías. Quítalos cuando tengas los tuyos.
+        </p>
+        <button class="btn alt sm" id="clearDemo">Quitar los 5 puntajes precargados</button>
       </div>
       <div class="card">
         <h3 style="font-size:15px">Borrar</h3>
