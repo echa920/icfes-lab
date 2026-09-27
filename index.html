@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ICFES Lab — Preparación Saber 11</title>
+<meta name="description" content="Diagnóstico, práctica y simulacros para la prueba Saber 11 del Icfes. Sin cuenta, sin servidor, sin rastreo.">
+<meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{
+    --bg:#0b1220; --card:#16233b; --card2:#1d2d49; --card3:#243758;
+    --line:#26374f; --txt:#e8eef8; --dim:#93a4bd; --dim2:#6b7f9c;
+    --acc:#fbbf24; --acc2:#38bdf8; --ok:#34d399; --bad:#f87171;
+    --r:14px; --pt:env(safe-area-inset-top,0px); --pb:env(safe-area-inset-bottom,0px);
+  }
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--txt);
+    font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    padding-bottom:calc(86px + var(--pb));
+  }
+  img{max-width:100%}
+  [hidden]{display:none!important}
+  button{font:inherit; color:inherit; cursor:pointer}
+  a{color:var(--acc2)}
+
+  .wrap{max-width:840px; margin:0 auto; padding:0 16px}
+  header{
+    position:sticky; top:0; z-index:20; background:rgba(11,18,32,.93);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+    padding-top:calc(12px + var(--pt)); padding-bottom:12px;
+  }
+  .hd{display:flex; align-items:center; gap:12px}
+  .logo{font-size:21px; font-weight:800; letter-spacing:-.4px; margin:0}
+  .logo span{color:var(--acc)}
+  .count{margin-left:auto; text-align:right; line-height:1.2; background:0; border:0; padding:0}
+  .count b{display:block; font-size:19px; color:var(--acc)}
+  .count small{color:var(--dim2); font-size:10.5px; text-transform:uppercase; letter-spacing:.7px}
+
+  .demo{
+    display:flex; gap:10px; align-items:flex-start; margin:16px 0 0;
+    background:#2a2413; border:1px solid #574414; border-radius:var(--r);
+    padding:12px 14px; font-size:13px; color:#f4dfa8;
+  }
+  .demo b{color:var(--acc)}
+  .demo button{
+    margin-left:auto; flex:none; background:transparent; border:1px solid #6b5518;
+    color:var(--acc); border-radius:8px; padding:5px 11px; font-size:12px; font-weight:600;
+  }
+  .demo button:hover{background:#38300f}
+
+  section{margin:22px 0}
+  h2{font-size:12.5px; text-transform:uppercase; letter-spacing:1.1px; color:var(--dim2); margin:0 0 12px}
+  h3{font-size:16px; margin:0 0 8px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px}
+  .card + .card{margin-top:12px}
+  .grid{display:grid; gap:12px}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(148px,1fr))}
+  .muted{color:var(--dim); font-size:14px}
+  .tiny{color:var(--dim2); font-size:12.5px}
+
+  .hero{display:flex; align-items:center; gap:22px; flex-wrap:wrap}
+  .ring{position:relative; flex:none; width:132px; height:132px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .val{position:absolute; inset:0; display:grid; place-content:center; text-align:center; line-height:1.1}
+  .ring .val b{font-size:34px; font-weight:800; display:block}
+  .ring .val small{color:var(--dim2); font-size:10.5px; letter-spacing:.6px}
+  .heroTxt{flex:1; min-width:200px}
+  .heroTxt p{margin:0 0 6px; color:var(--dim)}
+  .heroTxt .big{font-size:17px; color:var(--txt); font-weight:600}
+
+  .tile{background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:14px}
+  .tile b{display:block; font-size:23px; font-weight:800; letter-spacing:-.5px}
+  .tile small{color:var(--dim2); font-size:10.5px; text-transform:uppercase; letter-spacing:.7px}
+
+  .area{margin-bottom:16px}
+  .area:last-child{margin-bottom:0}
+  .areaTop{display:flex; align-items:baseline; gap:8px; margin-bottom:6px; font-size:14px; flex-wrap:wrap}
+  .areaTop b{font-weight:600}
+  .areaTop em{margin-left:auto; font-style:normal; font-variant-numeric:tabular-nums; color:var(--dim)}
+  .lvl{
+    font-size:10.5px; font-weight:700; letter-spacing:.4px; border-radius:5px;
+    padding:2px 7px; background:var(--card3); color:var(--dim);
+  }
+  .lvl.n3{background:#12304a; color:#7dd3fc}
+  .lvl.n4{background:#0f3026; color:#6ee7b7}
+  .bar{height:9px; background:#0d1626; border-radius:99px; overflow:hidden}
+  .bar i{display:block; height:100%; border-radius:99px; transition:width .5s ease}
+
+  .chartBox{overflow-x:auto}
+  .chart{min-width:440px; width:100%; height:200px; display:block}
+
+  .btn{background:var(--acc); color:#231a02; border:0; border-radius:10px; padding:12px 20px; font-weight:700; font-size:15px}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.alt{background:var(--card2); color:var(--txt); border:1px solid var(--line)}
+  .btn.alt:hover{background:#25385a}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  .btn:disabled{opacity:.45; cursor:not-allowed; filter:none}
+  .btnRow{display:flex; gap:10px; flex-wrap:wrap}
+
+  /* chips de filtro */
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{
+    background:var(--card2); border:1.5px solid var(--line); color:var(--dim);
+    border-radius:99px; padding:7px 14px; font-size:13.5px; font-weight:600;
+  }
+  .chip[aria-pressed="true"]{background:#15304a; border-color:var(--acc2); color:#bae6fd}
+  .chip:disabled{opacity:.4; cursor:not-allowed}
+
+  /* quiz */
+  .qbar{display:flex; align-items:center; gap:10px; margin-bottom:12px; font-size:13px; color:var(--dim); flex-wrap:wrap}
+  .qbar .timer{margin-left:auto; font-variant-numeric:tabular-nums; font-weight:700; color:var(--acc2)}
+  .qbar .timer.warn{color:var(--bad)}
+  .prog{height:5px; background:#0d1626; border-radius:99px; overflow:hidden; margin-bottom:16px}
+  .prog i{display:block; height:100%; background:var(--acc); border-radius:99px; transition:width .3s}
+  .nav20{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px}
+  .nav20 button{
+    width:32px; height:32px; border-radius:8px; background:var(--card2);
+    border:1.5px solid var(--line); color:var(--dim2); font-size:12.5px; font-weight:700;
+  }
+  .nav20 button.done{background:#1b3350; border-color:#35567f; color:#cfe3f7}
+  .nav20 button.dud{border-color:var(--acc); color:var(--acc)}
+  .nav20 button.here{background:var(--acc2); border-color:var(--acc2); color:#04222f}
+  .ctx{
+    background:#0f1a2c; border-left:3px solid var(--acc2); border-radius:0 10px 10px 0;
+    padding:13px 15px; margin-bottom:16px; color:#c8d6ea; font-size:14px; white-space:pre-line;
+  }
+  .qtext{font-size:17px; line-height:1.55; margin:0 0 18px; font-weight:500}
+  .opts{display:grid; gap:9px}
+  .opt{
+    text-align:left; background:var(--card2); border:1.5px solid var(--line); border-radius:11px;
+    padding:13px 15px; display:flex; gap:12px; align-items:flex-start; width:100%;
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover:not(:disabled){border-color:#4a678f}
+  .opt .k{
+    flex:none; width:25px; height:25px; border-radius:7px; background:#2b3f61;
+    display:grid; place-content:center; font-size:12.5px; font-weight:800; color:var(--dim);
+  }
+  .opt.sel{border-color:var(--acc2); background:#15304a}
+  .opt.sel .k{background:var(--acc2); color:#04222f}
+  .opt.good{border-color:var(--ok); background:#0f3026}
+  .opt.good .k{background:var(--ok); color:#04301f}
+  .opt.wrong{border-color:var(--bad); background:#34151a}
+  .opt.wrong .k{background:var(--bad); color:#3b0a0d}
+  .fb{margin-top:16px; border-radius:11px; padding:14px 16px; font-size:14px; line-height:1.6}
+  .fb.good{background:#0f2b22; border:1px solid #1d5c46}
+  .fb.bad{background:#2e1418; border:1px solid #6b2630}
+  .fb b{display:block; margin-bottom:5px}
+  .fb.good b{color:var(--ok)}
+  .fb.bad b{color:var(--bad)}
+
+  .res{text-align:center; padding:8px 0}
+  .res .num{font-size:60px; font-weight:800; letter-spacing:-2px; line-height:1; color:var(--acc)}
+  .res .of{color:var(--dim2); margin-bottom:20px}
+
+  .hrow{display:flex; align-items:center; gap:13px; padding:13px 0; border-bottom:1px solid var(--line); font-size:14px}
+  .hrow:last-child{border-bottom:0}
+  .hrow .sc{
+    flex:none; width:52px; height:40px; border-radius:9px; background:var(--card2);
+    display:grid; place-content:center; font-weight:800; font-size:16px; color:var(--acc);
+  }
+  .hrow .mt{flex:1; min-width:0}
+  .hrow .mt b{display:block; font-weight:600}
+  .hrow .mt small{color:var(--dim2); font-size:12px}
+  .hrow .dl{color:var(--dim2); font-size:12px; text-align:right; flex:none}
+  .tag{
+    display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+    background:#3a2f10; color:var(--acc); border-radius:5px; padding:2px 6px; margin-left:6px;
+  }
+  .empty{color:var(--dim2); text-align:center; padding:26px 10px; font-size:14px}
+
+  /* revisión */
+  .rev{border-bottom:1px solid var(--line); padding:16px 0}
+  .rev:last-child{border-bottom:0}
+  .revHd{display:flex; gap:9px; align-items:center; margin-bottom:9px; font-size:12.5px; color:var(--dim2)}
+  .revHd .mark{
+    width:20px; height:20px; border-radius:6px; display:grid; place-content:center;
+    font-size:11px; font-weight:800; flex:none;
+  }
+  .revHd .mark.ok{background:var(--ok); color:#04301f}
+  .revHd .mark.no{background:var(--bad); color:#3b0a0d}
+  .rev .qq{font-size:15px; font-weight:500; margin:0 0 9px}
+  .rev .ans{font-size:13.5px; margin:3px 0}
+  .rev .ex{font-size:13.5px; color:var(--dim); margin-top:9px; line-height:1.6}
+
+  /* guía */
+  .tbl{width:100%; border-collapse:collapse; font-size:13.5px}
+  .tbl th,.tbl td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line)}
+  .tbl th{color:var(--dim2); font-size:11px; text-transform:uppercase; letter-spacing:.6px; font-weight:700}
+  .tblBox{overflow-x:auto}
+  .formula{
+    background:#0f1a2c; border:1px solid var(--line); border-radius:10px; padding:13px 15px;
+    font-family:ui-monospace,Consolas,monospace; font-size:13px; color:#cfe3f7; overflow-x:auto;
+  }
+  details{border-top:1px solid var(--line); padding:12px 0}
+  details:first-of-type{border-top:0}
+  summary{cursor:pointer; font-weight:600; font-size:15px}
+  details p{color:var(--dim); font-size:14px; margin:9px 0 0}
+
+  /* videoteca */
+  .vid{display:flex; gap:11px; align-items:center; padding:11px 0; border-bottom:1px solid var(--line)}
+  .vid:last-child{border-bottom:0}
+  .vid .th{
+    width:62px; height:40px; border-radius:7px; background:var(--card2); flex:none;
+    display:grid; place-content:center; font-size:17px;
+  }
+  .vid .mt{flex:1; min-width:0}
+  .vid .mt b{display:block; font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .vid .mt small{color:var(--dim2); font-size:12px}
+  .vid .x{background:0; border:0; color:var(--dim2); font-size:18px; padding:4px 8px; flex:none}
+  .vid .x:hover{color:var(--bad)}
+  .player{margin-top:14px; aspect-ratio:16/9; width:100%; border-radius:10px; overflow:hidden; background:#000}
+  .player iframe{width:100%; height:100%; border:0; display:block}
+  input[type=text],input[type=date],input[type=number],textarea,select{
+    width:100%; background:#0f1a2c; border:1px solid var(--line); color:var(--txt);
+    border-radius:9px; padding:10px 12px; font:inherit; font-size:14px;
+  }
+  textarea{min-height:88px; resize:vertical; font-family:ui-monospace,Consolas,monospace; font-size:12.5px}
+  label.fld{display:block; margin-bottom:12px}
+  label.fld span{display:block; font-size:12.5px; color:var(--dim2); margin-bottom:5px}
+
+  nav{
+    position:fixed; left:0; right:0; bottom:0; z-index:30; background:rgba(17,27,46,.96);
+    backdrop-filter:blur(12px); border-top:1px solid var(--line); padding-bottom:var(--pb);
+  }
+  .navIn{max-width:840px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr)}
+  nav button{
+    background:0; border:0; padding:11px 2px 13px; display:grid; gap:3px; justify-items:center;
+    color:var(--dim2); font-size:10.5px; font-weight:600;
+  }
+  nav button .ic{font-size:18px; line-height:1}
+  nav button[aria-current="true"]{color:var(--acc)}
+  footer{text-align:center; color:var(--dim2); font-size:12px; padding:10px 0 4px; line-height:1.7}
+  @media (max-width:420px){
+    .ring{width:114px; height:114px}
+    .ring .val b{font-size:30px}
+    .res .num{font-size:50px}
+    .qtext{font-size:16px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <h1 class="logo">ICFES <span>Lab</span></h1>
+    <button class="count" id="ddayBtn" title="Toca para cambiar la fecha de la prueba">
+      <b id="dday">—</b>
+      <small id="ddayLbl">días para la prueba</small>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="demo" id="demoBanner" hidden>
+    <span>⚠️</span>
+    <div><b>Datos de ejemplo.</b> Los 5 intentos del historial son de demostración, no resultados reales tuyos. Bórralos cuando empieces a practicar en serio.</div>
+    <button id="clearDemo">Borrar</button>
+  </div>
+
+  <!-- ==================== INICIO ==================== -->
+  <div id="view-inicio">
+    <section>
+      <div class="card hero">
+        <div class="ring">
+          <svg width="132" height="132" viewBox="0 0 132 132">
+            <circle cx="66" cy="66" r="57" fill="none" stroke="#0d1626" stroke-width="13"></circle>
+            <circle id="ringArc" cx="66" cy="66" r="57" fill="none" stroke="#fbbf24" stroke-width="13"
+                    stroke-linecap="round" stroke-dasharray="358" stroke-dashoffset="358"></circle>
+          </svg>
+          <div class="val"><b id="avgScore">—</b><small>DE 500</small></div>
+        </div>
+        <div class="heroTxt">
+          <p class="big" id="heroTitle">Sin intentos aún</p>
+          <p id="heroSub">Empieza con el diagnóstico para saber dónde estás parado.</p>
+          <div class="btnRow" style="margin-top:14px">
+            <button class="btn" data-go="diag">Hacer diagnóstico</button>
+            <button class="btn alt" data-go="practica">Practicar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Resumen</h2>
+      <div class="grid g3">
+        <div class="tile"><b id="stExams">0</b><small>Intentos</small></div>
+        <div class="tile"><b id="stQs">0</b><small>Preguntas hechas</small></div>
+        <div class="tile"><b id="stAcc">—</b><small>Acierto global</small></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Puntaje y nivel por área</h2>
+      <div class="card" id="areaBars"></div>
+    </section>
+
+    <section>
+      <h2>Progreso contra tu meta</h2>
+      <div class="card chartBox"><svg class="chart" id="chart" viewBox="0 0 660 200"></svg></div>
+    </section>
+  </div>
+
+  <!-- ==================== DIAGNÓSTICO ==================== -->
+  <div id="view-diag" hidden>
+    <section>
+      <h2>Examen diagnóstico</h2>
+      <div class="card">
+        <h3>20 preguntas · 30 minutos</h3>
+        <p class="muted" style="margin:0 0 14px">
+          Cuatro preguntas por cada una de las cinco áreas. Son <b>siempre las mismas</b>, a propósito:
+          así cada intento se compara contra la misma vara y el cambio que veas es tu progreso, no otra prueba.
+        </p>
+        <ul class="muted" style="margin:0 0 16px; padding-left:20px">
+          <li>Puedes navegar entre preguntas y marcar las dudosas</li>
+          <li>Al acabarse el tiempo se entrega automáticamente</li>
+          <li>Si cierras la pestaña, el intento sigue donde lo dejaste</li>
+          <li>Al final: puntaje global, nivel por área y revisión pregunta por pregunta</li>
+        </ul>
+        <div class="btnRow">
+          <button class="btn" id="btnDiagStart">Empezar diagnóstico</button>
+          <button class="btn alt" id="btnDiagResume" hidden>Continuar intento guardado</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:14px">Cuidado al leer el resultado</h3>
+        <p class="tiny" style="margin:0">
+          Con 4 preguntas por área, cada acierto mueve el puntaje de esa área unos 25 puntos. El diagnóstico
+          ubica tu punto de partida y señala el área más floja; no mide diferencias finas. Para una lectura
+          más estable, practica por área con las 75 preguntas del banco.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== PRÁCTICA ==================== -->
+  <div id="view-practica" hidden>
+    <section>
+      <h2>Práctica libre</h2>
+      <div class="card">
+        <p class="tiny" style="margin:0 0 9px">Área</p>
+        <div class="chips" id="fArea"></div>
+        <p class="tiny" style="margin:16px 0 9px">Dificultad</p>
+        <div class="chips" id="fDif"></div>
+        <p class="tiny" style="margin:16px 0 9px">Conjunto</p>
+        <div class="chips" id="fSet"></div>
+        <p class="muted" id="fCount" style="margin:16px 0 14px">—</p>
+        <div class="btnRow">
+          <button class="btn" id="btnPractStart">Empezar práctica</button>
+          <button class="btn alt sm" id="btnPractReset">Quitar filtros</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== PROGRESO ==================== -->
+  <div id="view-progreso" hidden>
+    <section>
+      <h2>Historial de intentos</h2>
+      <div class="card" id="history"></div>
+    </section>
+    <section>
+      <h2>Acierto por área en práctica</h2>
+      <div class="card" id="areaAcc"></div>
+    </section>
+    <section>
+      <h2>Cobertura del banco</h2>
+      <div class="card" id="coverage"></div>
+    </section>
+  </div>
+
+  <!-- ==================== MÁS ==================== -->
+  <div id="view-mas" hidden>
+    <section>
+      <h2>Guía de la prueba</h2>
+      <div class="card">
+        <h3>Cómo se calcula tu puntaje</h3>
+        <p class="muted" style="margin:0 0 12px">
+          Cada una de las cinco pruebas se califica de 0 a 100. El puntaje global va de 0 a 500 y
+          pondera las áreas: las cuatro primeras pesan 3 y el Inglés pesa 1.
+        </p>
+        <div class="formula">Global = [ (3·LC + 3·MAT + 3·SOC + 3·CN + 1·ING) ÷ 13 ] × 5</div>
+        <p class="tiny" style="margin:12px 0 0">
+          Consecuencia práctica: subir 10 puntos en Matemáticas vale tres veces más que subir 10 en Inglés.
+          Si tienes poco tiempo, el rendimiento por hora estudiada es mayor en las cuatro áreas de peso 3.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Niveles de desempeño</h3>
+        <p class="tiny" style="margin:0 0 12px">Puntos de corte oficiales del Icfes.</p>
+        <div class="tblBox">
+          <table class="tbl">
+            <thead><tr><th>Prueba</th><th>Nivel 1</th><th>Nivel 2</th><th>Nivel 3</th><th>Nivel 4</th></tr></thead>
+            <tbody>
+              <tr><td>Lectura Crítica</td><td>0–35</td><td>36–50</td><td>51–65</td><td>66–100</td></tr>
+              <tr><td>Matemáticas</td><td>0–35</td><td>36–50</td><td>51–70</td><td>71–100</td></tr>
+              <tr><td>Sociales y Ciudadanas</td><td>0–40</td><td>41–55</td><td>56–70</td><td>71–100</td></tr>
+              <tr><td>Ciencias Naturales</td><td>0–40</td><td>41–55</td><td>56–70</td><td>71–100</td></tr>
+              <tr><td>Inglés</td><td colspan="4">A− 0–47 · A1 48–57 · A2 58–67 · B1 68–78 · B+ 79–100</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Estrategia por área</h3>
+        <details>
+          <summary>Lectura Crítica</summary>
+          <p>No pide conocimientos previos: pide leer bien. Lee primero la pregunta, luego el texto buscando
+          eso. Desconfía de las opciones que son ciertas en general pero no responden lo que se pregunta, y
+          de las que exageran con "siempre", "nunca" o "por completo".</p>
+        </details>
+        <details>
+          <summary>Matemáticas</summary>
+          <p>La mitad de las preguntas son de interpretación de tablas, gráficos y porcentajes, no de álgebra
+          pesada. Antes de calcular, pregúntate qué te están pidiendo exactamente: el error más común es
+          resolver bien y responder otra cosa (hallar x cuando piden x²).</p>
+        </details>
+        <details>
+          <summary>Sociales y Ciudadanas</summary>
+          <p>Evalúa Constitución, mecanismos de participación, derechos y análisis de fuentes. Muchas
+          preguntas se responden razonando desde el Estado social de derecho, sin memorizar artículos.
+          Distingue correlación de causalidad cuando te presenten datos.</p>
+        </details>
+        <details>
+          <summary>Ciencias Naturales</summary>
+          <p>Integra biología, química y física alrededor del método científico. Identifica variable
+          independiente, dependiente y grupo control; muchas preguntas se resuelven leyendo el montaje
+          experimental con cuidado más que aplicando fórmulas.</p>
+        </details>
+        <details>
+          <summary>Inglés</summary>
+          <p>Pesa 1 de 13, así que no es donde más rinde estudiar, pero es la más fácil de subir rápido:
+          vocabulario cotidiano, avisos, correos y estructuras básicas. Practica leer avisos y mensajes
+          cortos buscando la idea central sin traducir palabra por palabra.</p>
+        </details>
+      </div>
+    </section>
+
+    <section>
+      <h2>Videoteca</h2>
+      <div class="card">
+        <p class="muted" style="margin:0 0 14px" id="vidIntro">
+          Guarda aquí los videos de YouTube que uses para estudiar, organizados por área. Se abren
+          dentro del sitio y quedan guardados en este navegador.
+        </p>
+        <div id="vidList"></div>
+        <div style="margin-top:14px">
+          <label class="fld"><span>Enlace de YouTube</span>
+            <input type="text" id="vidUrl" placeholder="https://www.youtube.com/watch?v=..." inputmode="url"></label>
+          <label class="fld"><span>Título</span>
+            <input type="text" id="vidTitle" placeholder="Por ejemplo: Funciones cuadráticas explicadas"></label>
+          <label class="fld"><span>Área</span>
+            <select id="vidArea"></select></label>
+          <button class="btn sm" id="btnVidAdd">Agregar video</button>
+        </div>
+        <div class="player" id="vidPlayer" hidden></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Ajustes</h2>
+      <div class="card">
+        <label class="fld"><span>Fecha de la prueba</span><input type="date" id="setDate"></label>
+        <label class="fld"><span>Meta de puntaje global (0–500)</span>
+          <input type="number" id="setGoal" min="0" max="500" step="5"></label>
+        <button class="btn sm" id="btnSaveSet">Guardar ajustes</button>
+      </div>
+      <div class="card">
+        <h3 style="font-size:15px">Respaldo</h3>
+        <p class="tiny" style="margin:0 0 12px">
+          Tu progreso vive en el <code>localStorage</code> de este navegador. Si borras los datos de
+          navegación se pierde, y no te sigue a otro dispositivo. Exporta de vez en cuando.
+        </p>
+        <div class="btnRow" style="margin-bottom:14px">
+          <button class="btn alt sm" id="btnExport">Exportar a archivo</button>
+          <button class="btn alt sm" id="btnCopy">Copiar al portapapeles</button>
+        </div>
+        <label class="fld"><span>Importar: pega aquí un respaldo y confirma</span>
+          <textarea id="impBox" placeholder='{"examDate":"...","attempts":[...]}'></textarea></label>
+        <button class="btn alt sm" id="btnImport">Importar respaldo</button>
+      </div>
+      <div class="card">
+        <h3 style="font-size:15px">Borrar</h3>
+        <p class="tiny" style="margin:0 0 12px">Elimina intentos, progreso por área y errores guardados.</p>
+        <button class="btn alt sm" id="btnReset">Borrar todo mi progreso</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== QUIZ ==================== -->
+  <div id="view-quiz" hidden>
+    <section>
+      <div class="qbar">
+        <button class="btn alt sm" id="btnQuit">← Salir</button>
+        <span id="qCount"></span>
+        <span class="timer" id="qTimer" hidden></span>
+      </div>
+      <div class="prog"><i id="qProg" style="width:0%"></i></div>
+      <div class="nav20" id="qNav" hidden></div>
+      <div class="card">
+        <div class="ctx" id="qCtx" hidden></div>
+        <p class="qtext" id="qText"></p>
+        <div class="opts" id="qOpts"></div>
+        <div class="fb" id="qFb" hidden></div>
+        <div class="btnRow" style="margin-top:18px">
+          <button class="btn" id="btnNext" disabled>Confirmar</button>
+          <button class="btn alt sm" id="btnDud" hidden>☆ Marcar dudosa</button>
+          <button class="btn alt sm" id="btnPrev" hidden>← Anterior</button>
+          <button class="btn alt sm" id="btnSubmit" hidden>Entregar</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== RESULTADO ==================== -->
+  <div id="view-result" hidden>
+    <section>
+      <div class="card res">
+        <div class="num" id="rNum">—</div>
+        <div class="of" id="rOf"></div>
+        <div id="rBreak" style="text-align:left; margin:20px 0"></div>
+        <div class="btnRow" style="justify-content:center">
+          <button class="btn" id="btnReview">Revisar pregunta por pregunta</button>
+          <button class="btn alt" data-go="inicio">Ver mi progreso</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== REVISIÓN ==================== -->
+  <div id="view-review" hidden>
+    <section>
+      <div class="qbar"><button class="btn alt sm" data-go="result">← Volver al resultado</button></div>
+      <h2>Revisión</h2>
+      <div class="card" id="reviewList"></div>
+    </section>
+  </div>
+
+  <footer>
+    ICFES Lab · 75 preguntas originales en formato Saber 11 · no son preguntas liberadas por el Icfes<br>
+    No está afiliado al Icfes ni avalado por esa entidad · tu progreso se guarda solo en este navegador
+  </footer>
+</main>
+
+<nav>
+  <div class="navIn">
+    <button data-go="inicio" aria-current="true"><span class="ic">📊</span>Inicio</button>
+    <button data-go="diag"><span class="ic">⏱️</span>Diagnóstico</button>
+    <button data-go="practica"><span class="ic">✏️</span>Práctica</button>
+    <button data-go="progreso"><span class="ic">📈</span>Progreso</button>
+    <button data-go="mas"><span class="ic">📘</span>Guía</button>
+  </div>
+</nav>
+
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
